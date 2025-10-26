@@ -7,9 +7,9 @@ int steppin2 = 11;
 int dirpin3 = 12;
 int steppin3 = 13;
 
-int preDefinedDistance = 220;
+int preDefinedDistance = 200;
 
-void runStepper1(int direction, int numOfSteps, int pulsewidthMicros = 810) {
+void runStepper1(int direction, int numOfSteps, int pulsewidthMicros = 850) {
   digitalWrite(dirpin1, direction);
   for (int n = 0; n < numOfSteps; n++) {
     digitalWrite(steppin1, HIGH);
@@ -19,7 +19,7 @@ void runStepper1(int direction, int numOfSteps, int pulsewidthMicros = 810) {
   }
 }
 
-void runStepper2(int direction, int numOfSteps, int pulsewidthMicros = 810) {
+void runStepper2(int direction, int numOfSteps, int pulsewidthMicros = 850) {
   digitalWrite(dirpin2, direction);
   for (int n = 0; n < numOfSteps; n++) {
     digitalWrite(steppin2, HIGH);
@@ -29,7 +29,7 @@ void runStepper2(int direction, int numOfSteps, int pulsewidthMicros = 810) {
   }
 }
 
-void runStepper3(int direction, int numOfSteps, int pulsewidthMicros = 810) {
+void runStepper3(int direction, int numOfSteps, int pulsewidthMicros = 850) {
   digitalWrite(dirpin3, direction);
   for (int n = 0; n < numOfSteps; n++) {
     digitalWrite(steppin3, HIGH);
@@ -60,49 +60,93 @@ void setup() {
 
   digitalWrite(dirpin3, LOW);
   digitalWrite(steppin3, LOW);
+
+
+   // Move forward
+  for (int i = 0; i < 50; i++) {
+    runStepper1(HIGH, 50);
+  }
+
+  delay(1000); // 1 second pause
+
+  // Move backward
+  for (int i = 0; i < 50; i++) {
+    runStepper1(LOW, 50);
+  }
+
+  delay(1000); // 1 second pause 
+
+
+  // Move forward
+  runStepper2(HIGH, 50);
+
+  delay(1000); // 1 second pause
+
+  // Move backward
+  runStepper2(LOW, 50);
+
+  delay(1000); // 1 second pause 
+
+//    // Move forward
+  for (int i = 0; i < 50; i++) {
+    runStepper3(HIGH, 50);
+  }
+
+  delay(1000); // 1 second pause
+
+  // Move backward
+  for (int i = 0; i < 50; i++) {
+    runStepper3(LOW, 50);
+  }
+
+  delay(1000); // 1 second pause 
 }
 
 void loop() {
+  //stepper1
+ // Move forward 
+ for (int i = 0; i < preDefinedDistance; i++) {
+   runStepper1(HIGH, 200);
+ }
+
+ delay(1000); // 1 second pause
+
+ // Move backward
+ for (int i = 0; i < preDefinedDistance; i++) {
+   runStepper1(LOW, 200);
+ }
+
+ delay(1000); // 1 second pause 
+
+ //stepper2
+ 
+ // Move forward
+ runStepper2(HIGH, -70);
+
+ delay(1000); // 1 second pause
+
+ // Move backward
+ runStepper2(LOW, 70);
+ 
+ delay(1000); // 1 second pause 
+
+  // Move backward
+ runStepper2(LOW, -140);
+ 
+ delay(1000); // 1 second pause 
+ 
+  //stepper3
   // Move forward
-  for (int i = 0; i < preDefinedDistance; i++) {
-    runStepper1(HIGH, 200);
-  }
+ for (int i = 0; i < preDefinedDistance; i++) {
+   runStepper3(HIGH, 200);
+ }
 
-  delay(1000); // 1 second pause
+ delay(1000); // 1 second pause
 
-  // Move backward
-  for (int i = 0; i < preDefinedDistance; i++) {
-    runStepper1(LOW, 200);
-  }
+ // Move backward
+ for (int i = 0; i < preDefinedDistance; i++) {
+   runStepper3(LOW, 200);
+ }
 
-  delay(1000); // 1 second pause 
-
-
-    // Move forward
-  for (int i = 0; i < preDefinedDistance; i++) {
-    runStepper2(HIGH, 200);
-  }
-
-  delay(1000); // 1 second pause
-
-  // Move backward
-  for (int i = 0; i < preDefinedDistance; i++) {
-    runStepper2(LOW, 200);
-  }
-
-  delay(1000); // 1 second pause 
-
-    // Move forward
-  for (int i = 0; i < preDefinedDistance; i++) {
-    runStepper3(HIGH, 200);
-  }
-
-  delay(1000); // 1 second pause
-
-  // Move backward
-  for (int i = 0; i < preDefinedDistance; i++) {
-    runStepper3(LOW, 200);
-  }
-
-  delay(1000); // 1 second pause 
+ delay(1000); // 1 second pause 
 }
