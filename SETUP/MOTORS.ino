@@ -108,11 +108,11 @@ void driveStepper3(){
 //ROTATION SEQUENCE FUNCTION
 
 void setStep(int a, int b, int c, int d) {
-  digitalWrite(A_0, a);
-  digitalWrite(A_1, b);
-  digitalWrite(A_2, c);
-  digitalWrite(A_3, d);
-  delayMicroseconds(STEP_DELAY);
+  mcp.digitalWrite(A_0, a);
+  mcp.digitalWrite(A_1, b);
+  mcp.digitalWrite(A_2, c);
+  mcp.digitalWrite(A_3, d);
+  mcp.delayMicroseconds(STEP_DELAY);
 }
 
 void moveClockwise(int cycles){
