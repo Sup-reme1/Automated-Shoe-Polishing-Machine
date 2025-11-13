@@ -103,3 +103,32 @@ void driveStepper3(){
   }
   delay(1000); // 1 second pause 
 }
+
+
+//ROTATION SEQUENCE FUNCTION
+
+void setStep(int a, int b, int c, int d) {
+  digitalWrite(A_0, a);
+  digitalWrite(A_1, b);
+  digitalWrite(A_2, c);
+  digitalWrite(A_3, d);
+  delayMicroseconds(STEP_DELAY);
+}
+
+void moveClockwise(int cycles){
+  // Calculate the total number of steps needed
+  long totalSteps = (long)cycles * STEPS_PER_REVOLUTION;
+
+  // Loop through all the steps
+  for (long i = 0; i < totalSteps; i++) {    
+    // Step 1: 1000
+    setStep(HIGH, HIGH, LOW, LOW);
+    // Step 2: 0100
+    setStep(LOW, HIGH, HIGH, LOW);
+    // Step 3: 0010
+    setStep(LOW, LOW, HIGH, HIGH);
+    // Step 4: 0001
+    setStep(HIGH, LOW, LOW, HIGH);
+  }
+  setStep(LOW, LOW, LOW, LOW);
+}

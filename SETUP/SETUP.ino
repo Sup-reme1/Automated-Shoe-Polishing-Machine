@@ -1,8 +1,25 @@
 // Add the library with motor functions
 #include <Wire.h> 
 #include <LiquidCrystal_I2C.h>
+#include <Adafruit_BusIO_Register.h>
+#include <Adafruit_MCP23XXX.h>
+#include <Adafruit_MCP23X17.h>
+#include <Adafruit_MCP23X08.h>
 
 LiquidCrystal_I2C lcd(0x27, 16, 2);
+
+//create an instance
+Adafruit_MCP23X17 mcp;
+
+//small stepper variables
+const int STEPS_PER_REVOLUTION = 512;
+const int STEP_DELAY = 2000;
+
+//mcp uln pins
+#define A_0 0 //IN1
+#define A_1 1 //IN2
+#define A_2 2 //IN3
+#define A_3 3 //IN4
 
 int dirpin1 = 8;
 int steppin1 = 9;
@@ -58,12 +75,26 @@ void screen() {
 
 void setup() {
   Serial.begin(9600);
+
+  //starts mcp in I2C mode
+  mcp.begin_I2C();
+
   lcd.begin();
   lcd.backlight();  
   lcd.clear();
   screen();
 
-//Initializing Stepper motor 
+
+  // configure pin of mcp for output
+  mcp.pinMode(A_0, OUTPUT);
+  mcp.pinMode(A_1, OUTPUT);
+  mcp.pinMode(A_2, OUTPUT);
+  mcp.pinMode(A_3, OUTPUT);
+
+  // drive pins low
+  setStep(LOW, LOW, LOW, LOW);
+
+  //Initializing Stepper motor 
   initializeMotor();
 
   pinMode(pump1RelayPin, OUTPUT);
@@ -71,7 +102,7 @@ void setup() {
   digitalWrite(pump1RelayPin, LOW);
   digitalWrite(pump2RelayPin, HIGH);  
 
-// Set up  pins as inputs or outputs
+  // Set up  pins as inputs or outputs
   pinMode(stopButtonPin, INPUT_PULLUP);
   pinMode(BpolishButtonPin, INPUT_PULLUP);
   pinMode(BrpolishButtonPin, INPUT_PULLUP);
@@ -105,57 +136,40 @@ void loop() {
     delay(5000);
   } 
 
-
-//  driveStepper2ClockWise();
-//  delay(2000);
-//  driveStepper2ClockWise();
-//  delay(2000);
-//  driveStepper2ClockWise();
-//  delay(2000);
-//  driveStepper2ClockWise();
-//  delay(2000);
-//  driveStepper2AntiClockWise();
-//  delay(2000);
-//  driveStepper2AntiClockWise();
-//  delay(2000);
-//  driveStepper2AntiClockWise();
-//  delay(2000);
-//  driveStepper2AntiClockWise();
-//  delay(2000);
-  
+    moveClockwise(1);
 
 //  Engine Starts Here
   //clean routine
   // Move stepper 1 forward 
-  driveStepper1();  // Clean left side of the shoe 
-  turnOnWaterPump();
-  driveStepper2AntiClockWise();  // Drive shoe holder 
-  turnOnWaterPump();
-  driveStepper1();  // Clean top side of the shoe
-  turnOnWaterPump();
-  driveStepper2AntiClockWise();  // Drive shoe holder
-  driveStepper1();  // Clean right side of the shoe
+  // driveStepper1();  // Clean left side of the shoe 
+  // turnOnWaterPump();
+  // driveStepper2AntiClockWise();  // Drive shoe holder 
+  // turnOnWaterPump();
+  // driveStepper1();  // Clean top side of the shoe
+  // turnOnWaterPump();
+  // driveStepper2AntiClockWise();  // Drive shoe holder
+  // driveStepper1();  // Clean right side of the shoe
 
-  // Adjust this function to return the shoe to the start position
-  driveStepper2ClockWise();  // Drive shoe holder
-  // polishing routine  
-  turnOnPump();     // Activate pump for black polish on right side
-  driveStepper2ClockWise();  // Drive shoe holder
-  driveStepper3();  // Polish right side of shoe
+  // // Adjust this function to return the shoe to the start position
+  // driveStepper2ClockWise();  // Drive shoe holder
+  // // polishing routine  
+  // turnOnPump();     // Activate pump for black polish on right side
+  // driveStepper2ClockWise();  // Drive shoe holder
+  // driveStepper3();  // Polish right side of shoe
   
-  turnOnPump();     // Activate pump for black polish on top side  
-  driveStepper2ClockWise();  // Drive shoe holder
-  driveStepper3();  // Polish top side of shoe
+  // turnOnPump();     // Activate pump for black polish on top side  
+  // driveStepper2ClockWise();  // Drive shoe holder
+  // driveStepper3();  // Polish top side of shoe
 
-  turnOnPump();     // Activate pump for black polish
-  driveStepper2ClockWise();  // Drive shoe holder
-  driveStepper3();  // Drive polish brush and return to start
+  // turnOnPump();     // Activate pump for black polish
+  // driveStepper2ClockWise();  // Drive shoe holder
+  // driveStepper3();  // Drive polish brush and return to start
   
-  driveStepper2AntiClockWise();  // Drive shoe holder
-  driveStepper2AntiClockWise();  // Drive shoe holder
+  // driveStepper2AntiClockWise();  // Drive shoe holder
+  // driveStepper2AntiClockWise();  // Drive shoe holder
 
-  digitalWrite(buzzerRelayPin, HIGH); // Turn on buzzer to indicate end of cycle
-  delay(2000); // Buzzer on for 2 seconds
-  digitalWrite(buzzerRelayPin, LOW); // Turn on buzzer to indicate end of cycle
-  delay(2000);
+  // digitalWrite(buzzerRelayPin, HIGH); // Turn on buzzer to indicate end of cycle
+  // delay(2000); // Buzzer on for 2 seconds
+  // digitalWrite(buzzerRelayPin, LOW); // Turn on buzzer to indicate end of cycle
+  // delay(2000);
 }
