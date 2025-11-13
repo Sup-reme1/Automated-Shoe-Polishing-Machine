@@ -1,4 +1,4 @@
-// add the library with motor functions
+// Add the library with motor functions
 #include <Wire.h> 
 #include <LiquidCrystal_I2C.h>
 
@@ -27,21 +27,41 @@ const int buzzerRelayPin = 5; // Analog pin 1 - Pin to control the buzzer relay
 const int pump1RelayPin = 7; // Pin to control the pump1 polish relay
 const int pump2RelayPin = 6; // Pin to control the pump2 relay
 
+void screen() {
+      String scrollMessage = "Shoe Polishing Machine";
+      int displayWidth = 16; 
 
-// pump control functions
-void turnOnPump() {
-  digitalWrite(pump1RelayPin, HIGH);
-  delay(1000);
-  digitalWrite(pump1RelayPin, LOW);
-  delay(2000);
-}
+      // Print the scrolling message to the second row
+      lcd.setCursor(0, 0);
+      lcd.print(scrollMessage);
+
+      // Scroll the message to the left
+      for (int i = 0; i < scrollMessage.length() - displayWidth + 1; i++) {
+        lcd.scrollDisplayLeft();
+        delay(250); // Adjust delay for scrolling speed
+      }
+
+     // scroll the message back to the right
+      for (int i = 0; i < scrollMessage.length() - displayWidth + 1; i++) {
+        lcd.scrollDisplayRight();
+        delay(250); // Adjust delay for scrolling speed
+      }
+
+      // Clear the second row to prepare for the next scroll
+      lcd.setCursor(0, 0);
+      for (int i = 0; i < displayWidth; i++) {
+        lcd.print(" ");
+      }
+      delay(1000); // Pause before repeating the scroll
+};
+
 
 void setup() {
   Serial.begin(9600);
   lcd.begin();
+  lcd.backlight();  
   lcd.clear();
-  lcd.backlight();
-  lcd.print("Shoe Polishing Machine");
+  screen();
 
 //Initializing Stepper motor 
   initializeMotor();
@@ -72,75 +92,70 @@ void setup() {
 }
 
 void loop() { 
+  screen();
+  
+  if (digitalRead(BpolishButtonPin) == LOW){
+    Serial.println("Black polish Btn Pressed");
+  } 
+  else if (digitalRead(BrpolishButtonPin) == LOW){
+    Serial.println("Brown polish Btn Pressed");
+  }
+  else if (digitalRead(stopButtonPin) == LOW){
+    Serial.println("Stop Btn Pressed");
+    delay(5000);
+  } 
 
-  driveStepper2ClockWise();  // Drive shoe holder
-  driveStepper2ClockWise();  // Drive shoe holder
-  driveStepper2ClockWise();  // Drive shoe holder
-  driveStepper2ClockWise();  // Drive shoe holder
 
-  delay(2000);
+//  driveStepper2ClockWise();
+//  delay(2000);
+//  driveStepper2ClockWise();
+//  delay(2000);
+//  driveStepper2ClockWise();
+//  delay(2000);
+//  driveStepper2ClockWise();
+//  delay(2000);
+//  driveStepper2AntiClockWise();
+//  delay(2000);
+//  driveStepper2AntiClockWise();
+//  delay(2000);
+//  driveStepper2AntiClockWise();
+//  delay(2000);
+//  driveStepper2AntiClockWise();
+//  delay(2000);
+  
+
+//  Engine Starts Here
+  //clean routine
+  // Move stepper 1 forward 
+  driveStepper1();  // Clean left side of the shoe 
+  turnOnWaterPump();
+  driveStepper2AntiClockWise();  // Drive shoe holder 
+  turnOnWaterPump();
+  driveStepper1();  // Clean top side of the shoe
+  turnOnWaterPump();
+  driveStepper2AntiClockWise();  // Drive shoe holder
+  driveStepper1();  // Clean right side of the shoe
+
+  // Adjust this function to return the shoe to the start position
+  driveStepper2ClockWise();  // Drive shoe holder
+  // polishing routine  
+  turnOnPump();     // Activate pump for black polish on right side
+  driveStepper2ClockWise();  // Drive shoe holder
+  driveStepper3();  // Polish right side of shoe
+  
+  turnOnPump();     // Activate pump for black polish on top side  
+  driveStepper2ClockWise();  // Drive shoe holder
+  driveStepper3();  // Polish top side of shoe
+
+  turnOnPump();     // Activate pump for black polish
+  driveStepper2ClockWise();  // Drive shoe holder
+  driveStepper3();  // Drive polish brush and return to start
   
   driveStepper2AntiClockWise();  // Drive shoe holder
   driveStepper2AntiClockWise();  // Drive shoe holder
-  driveStepper2AntiClockWise();  // Drive shoe holder
-  driveStepper2AntiClockWise();  // Drive shoe holder
 
-  driveStepper2AntiClockWise();  // Drive shoe holder
-
-
-//  Serial.println("In the loop");
-//  if (digitalRead(BpolishButtonPin) == LOW){
-//    Serial.println("Black polish Btn Pressed");
-//  } 
-//  else if (digitalRead(BrpolishButtonPin) == LOW){
-//    Serial.println("Brown polish Btn Pressed");
-//  }
-//  else if (digitalRead(stopButtonPin) == LOW){
-//    Serial.println("Stop Btn Pressed");
-//    delay(5000);
-//  } 
-//
-////  //clean routine
-////  // Move stepper 1 forward 
-////  Serial.println("Drive and return Clean brush");
-////  driveStepper1();  // Drive clean brush and return to start  
-////  // driveStepper2();  // Drive shoe holder
-////  driveStepper2AntiClockWise();  // Drive shoe holder
-////  driveStepper1();  // Drive clean brush and return to start
-////  // driveStepper2();  // Drive shoe holder
-////  driveStepper2AntiClockWise();  // Drive shoe holder
-////  driveStepper1();  // Drive clean brush and return to start
-//
-//  // Adjust this function to return the shoe to the start position
-//  // driveStepper2();  // Drive shoe holder to start position
-//  driveStepper2ClockWise();  // Drive shoe holder
-//
-//  // polishing routine
-//  // first wave of polish
-//  // driveStepper2();  // Drive shoe holder to face the side of the shoe upward
-//  turnOnPump();     // Activate pump for black polish
-//  // driveStepper2();  // Drive shoe holder
-//  Serial.println("Drive and return Clean brush");
-//  driveStepper2ClockWise();  // Drive shoe holder
-//  driveStepper3();  // Drive polish brush and return to 
-//
-//  turnOnPump();     // Activate pump for black polish
-//  // driveStepper2();  // Drive shoe holder
-//  driveStepper2ClockWise();  // Drive shoe holder
-//  driveStepper3();  // Drive polish brush and return to start
-//
-//  turnOnPump();     // Activate pump for black polish
-//  // driveStepper2();  // Drive shoe holder
-//  driveStepper2ClockWise();  // Drive shoe holder
-//  driveStepper3();  // Drive polish brush and return to start
-//  // Adjust this function to return the shoe to the start position
-//  // driveStepper2();  // Drive shoe holder to start position
-//  driveStepper2AntiClockWise();  // Drive shoe holder
-//  driveStepper2AntiClockWise();  // Drive shoe holder
-//
-//  digitalWrite(buzzerRelayPin, HIGH); // Turn on buzzer to indicate end of cycle
-//  delay(2000); // Buzzer on for 2 seconds
-//  digitalWrite(buzzerRelayPin, LOW); // Turn on buzzer to indicate end of cycle
-//  Serial.println("Restarting the loop");
-
+  digitalWrite(buzzerRelayPin, HIGH); // Turn on buzzer to indicate end of cycle
+  delay(2000); // Buzzer on for 2 seconds
+  digitalWrite(buzzerRelayPin, LOW); // Turn on buzzer to indicate end of cycle
+  delay(2000);
 }

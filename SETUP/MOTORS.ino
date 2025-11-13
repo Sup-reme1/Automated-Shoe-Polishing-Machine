@@ -18,6 +18,22 @@ void initializeMotor(){
   digitalWrite(steppin3, LOW);
 }
 
+// pump control functions
+void turnOnPump() {
+  digitalWrite(pump1RelayPin, HIGH);
+  delay(1000);
+  digitalWrite(pump1RelayPin, LOW);
+  delay(2000);
+}
+
+void turnOnWaterPump() {
+  digitalWrite(pump2RelayPin, HIGH);
+  delay(1000);
+  digitalWrite(pump2RelayPin, LOW);
+  delay(2000);
+}
+
+
 // Function to run steppers
 void runStepper1(int direction, int numOfSteps, int pulsewidthMicros = 810) {
   digitalWrite(dirpin1, direction);
@@ -43,7 +59,9 @@ void driveStepper1(){
   delay(1000); // 1 second pause 
 }
 
-void runStepper2(int direction, int pulsewidthMicros = 810, int numOfSteps=100) {
+//
+// Setting the numOfSteps to 465 to increase the speed
+void runStepper2(int direction, int pulsewidthMicros = 1500, int numOfSteps=48) {
   digitalWrite(dirpin2, direction);
   for (int n = 0; n < numOfSteps; n++) {
     digitalWrite(steppin2, HIGH);
