@@ -18,21 +18,48 @@ void initializeMotor(){
   digitalWrite(steppin3, LOW);
 }
 
-// pump control functions
-void turnOnPump() {
+void screen(String scrollMessage) {
+//  String scrollMessage = "Shoe Polishing Machine";
+  int displayWidth = 16; 
+
+  // Print the scrolling message to the second row
+  lcd.setCursor(0, 0);
+  lcd.print(scrollMessage);
+
+  // Scroll the message to the left
+  for (int i = 0; i < scrollMessage.length() - displayWidth + 1; i++) {
+    lcd.scrollDisplayLeft();
+    delay(250); // Adjust delay for scrolling speed
+  }
+
+ // scroll the message back to the right
+  for (int i = 0; i < scrollMessage.length() - displayWidth + 1; i++) {
+    lcd.scrollDisplayRight();
+    delay(250); // Adjust delay for scrolling speed
+  }
+
+  // Clear the second row to prepare for the next scroll
+  lcd.setCursor(0, 0);
+  for (int i = 0; i < displayWidth; i++) {
+    lcd.print(" ");
+  }
+  delay(1000); // Pause before repeating the scroll
+};
+
+void turnOnWaterPump() {
   digitalWrite(pump1RelayPin, HIGH);
   delay(1000);
   digitalWrite(pump1RelayPin, LOW);
   delay(2000);
 }
 
-void turnOnWaterPump() {
-  digitalWrite(pump2RelayPin, HIGH);
-  delay(1000);
+// pump control functions
+void turnOnPump() {
   digitalWrite(pump2RelayPin, LOW);
+  delay(1000);
+  digitalWrite(pump2RelayPin, HIGH);
   delay(2000);
 }
-
 
 // Function to run steppers
 void runStepper1(int direction, int numOfSteps, int pulsewidthMicros = 810) {
@@ -61,7 +88,7 @@ void driveStepper1(){
 
 //
 // Setting the numOfSteps to 465 to increase the speed
-void runStepper2(int direction, int pulsewidthMicros = 1500, int numOfSteps=48) {
+void runStepper2(int direction, int pulsewidthMicros = 10000000, int numOfSteps=800) {
   digitalWrite(dirpin2, direction);
   for (int n = 0; n < numOfSteps; n++) {
     digitalWrite(steppin2, HIGH);
@@ -106,12 +133,11 @@ void driveStepper3(){
 
 
 //ROTATION SEQUENCE FUNCTION
-
 void setStep(int a, int b, int c, int d) {
-  digitalWrite(A_0, a);
-  digitalWrite(A_1, b);
-  digitalWrite(A_2, c);
-  digitalWrite(A_3, d);
+  mcp.digitalWrite(A_0, a);
+  mcp.digitalWrite(A_1, b);
+  mcp.digitalWrite(A_2, c);
+  mcp.digitalWrite(A_3, d);
   delayMicroseconds(STEP_DELAY);
 }
 

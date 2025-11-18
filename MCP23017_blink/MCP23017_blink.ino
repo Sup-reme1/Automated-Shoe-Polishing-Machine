@@ -28,4 +28,12 @@ void setup() {
 
 void loop() {
 // pass
+  mcp.digitalWrite(A_0, HIGH);
+  delay(500);
+  mcp.digitalWrite(A_0, LOW);
+  mcp.digitalWrite(A_1, HIGH);  
+  delay(500);
+  mcp.digitalWrite(A_1, LOW);
+  mcp.digitalWrite(A_2, HIGH);
+  delay(500);
 }

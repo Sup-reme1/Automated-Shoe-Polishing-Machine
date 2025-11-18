@@ -24,11 +24,14 @@ const int STEP_DELAY = 2000;
 int dirpin1 = 8;
 int steppin1 = 9;
 
-int dirpin2 = 10;
-int steppin2 = 11;
+//int dirpin2 = 10;
+//int steppin2 = 11;
 
-int dirpin3 = 12;
-int steppin3 = 13;
+int dirpin2 = 12;
+int steppin2 = 13;
+
+int dirpin3;
+int steppin3;
 
 int preDefinedDistance = 225;
 
@@ -41,38 +44,11 @@ const int doorSensorPin ;  // Digital pin for the magnetic reed switch
 const int shoeSensorPin ;  // Digital pin for the IR proximity sensor
 
 const int buzzerRelayPin = 5; // Analog pin 1 - Pin to control the buzzer relay
-const int pump1RelayPin = 7; // Pin to control the pump1 polish relay
-const int pump2RelayPin = 6; // Pin to control the pump2 relay
+const int pump1RelayPin = 6; // Pin to control the pump1 water relay
+const int pump2RelayPin = 7; // Pin to control the pump2 relay
 
-void screen() {
-      String scrollMessage = "Shoe Polishing Machine";
-      int displayWidth = 16; 
-
-      // Print the scrolling message to the second row
-      lcd.setCursor(0, 0);
-      lcd.print(scrollMessage);
-
-      // Scroll the message to the left
-      for (int i = 0; i < scrollMessage.length() - displayWidth + 1; i++) {
-        lcd.scrollDisplayLeft();
-        delay(250); // Adjust delay for scrolling speed
-      }
-
-     // scroll the message back to the right
-      for (int i = 0; i < scrollMessage.length() - displayWidth + 1; i++) {
-        lcd.scrollDisplayRight();
-        delay(250); // Adjust delay for scrolling speed
-      }
-
-      // Clear the second row to prepare for the next scroll
-      lcd.setCursor(0, 0);
-      for (int i = 0; i < displayWidth; i++) {
-        lcd.print(" ");
-      }
-      delay(1000); // Pause before repeating the scroll
-};
-
-
+///////////////
+//  SETUP
 void setup() {
   Serial.begin(9600);
 
@@ -82,8 +58,7 @@ void setup() {
   lcd.begin();
   lcd.backlight();  
   lcd.clear();
-  screen();
-
+  screen("Shoe Polishing Machine");
 
   // configure pin of mcp for output
   mcp.pinMode(A_0, OUTPUT);
@@ -99,8 +74,8 @@ void setup() {
 
   pinMode(pump1RelayPin, OUTPUT);
   pinMode(pump2RelayPin, OUTPUT);
-  digitalWrite(pump1RelayPin, LOW);
-  digitalWrite(pump2RelayPin, HIGH);  
+  digitalWrite(pump1RelayPin, HIGH);
+  digitalWrite(pump2RelayPin, LOW);  
 
   // Set up  pins as inputs or outputs
   pinMode(stopButtonPin, INPUT_PULLUP);
@@ -123,53 +98,72 @@ void setup() {
 }
 
 void loop() { 
-  screen();
+//  screen("Enter Polish Color");
   
   if (digitalRead(BpolishButtonPin) == LOW){
-    Serial.println("Black polish Btn Pressed");
+    screen("Black Polish");
   } 
   else if (digitalRead(BrpolishButtonPin) == LOW){
-    Serial.println("Brown polish Btn Pressed");
+    screen("Brown Polish");
   }
   else if (digitalRead(stopButtonPin) == LOW){
-    Serial.println("Stop Btn Pressed");
-    delay(5000);
+    screen("Polishing");
+    delay(2000);
+    // Engine is inserted here
   } 
 
-    moveClockwise(1);
+//  screen("water pump");
+//  turnOnWaterPump();
+//  delay(500);
+//  screen("Polish pump");
+//  turnOnPump();
+//  delay(500);
 
-//  Engine Starts Here
-  //clean routine
+  driveStepper2ClockWise();
+  delay(500);
+  driveStepper2ClockWise();
+  delay(500);
+  driveStepper2ClockWise();
+  delay(500);
+  driveStepper2ClockWise();
+  delay(500);
+
+//  driveStepper1();
+  
+  // Engine Starts Here
+  // Clean routine
   // Move stepper 1 forward 
-  // driveStepper1();  // Clean left side of the shoe 
-  // turnOnWaterPump();
-  // driveStepper2AntiClockWise();  // Drive shoe holder 
-  // turnOnWaterPump();
-  // driveStepper1();  // Clean top side of the shoe
-  // turnOnWaterPump();
-  // driveStepper2AntiClockWise();  // Drive shoe holder
-  // driveStepper1();  // Clean right side of the shoe
+//   driveStepper2AntiClockWise();
+//   turnOnWaterPump();
+//   driveStepper2AntiClockWise();    
+//   driveStepper1();  // Clean left side of the shoe 
+//   turnOnWaterPump();
+//   driveStepper2AntiClockWise();  // Drive shoe holder 
+//   driveStepper1();  // Clean top side of the shoe
+//   turnOnWaterPump();
+//   driveStepper2AntiClockWise();  // Drive shoe holder
+//   driveStepper1();  // Clean right side of the shoe
 
-  // // Adjust this function to return the shoe to the start position
-  // driveStepper2ClockWise();  // Drive shoe holder
-  // // polishing routine  
-  // turnOnPump();     // Activate pump for black polish on right side
-  // driveStepper2ClockWise();  // Drive shoe holder
-  // driveStepper3();  // Polish right side of shoe
-  
-  // turnOnPump();     // Activate pump for black polish on top side  
-  // driveStepper2ClockWise();  // Drive shoe holder
-  // driveStepper3();  // Polish top side of shoe
+   // Adjust this function to return the shoe to the start position
+//   driveStepper2ClockWise();  // Drive shoe holder
+   // polishing routine  
+//   turnOnPump();     // Activate pump for black polish on right side
+//   driveStepper2ClockWise();  // Drive shoe holder
+//   driveStepper3();  // Polish right side of shoe
+//  
+//   turnOnPump();     // Activate pump for black polish on top side  
+//   driveStepper2ClockWise();  // Drive shoe holder
+//   driveStepper3();  // Polish top side of shoe
+//
+//   turnOnPump();     // Activate pump for black polish
+//   driveStepper2ClockWise();  // Drive shoe holder
+//   driveStepper3();  // Drive polish brush and return to start
+//  
+//   driveStepper2AntiClockWise();  // Drive shoe holder
+//   driveStepper2AntiClockWise();  // Drive shoe holder
 
-  // turnOnPump();     // Activate pump for black polish
-  // driveStepper2ClockWise();  // Drive shoe holder
-  // driveStepper3();  // Drive polish brush and return to start
-  
-  // driveStepper2AntiClockWise();  // Drive shoe holder
-  // driveStepper2AntiClockWise();  // Drive shoe holder
-
-  // digitalWrite(buzzerRelayPin, HIGH); // Turn on buzzer to indicate end of cycle
-  // delay(2000); // Buzzer on for 2 seconds
-  // digitalWrite(buzzerRelayPin, LOW); // Turn on buzzer to indicate end of cycle
-  // delay(2000);
+//   digitalWrite(buzzerRelayPin, HIGH); // Turn on buzzer to indicate end of cycle
+//   delay(2000); // Buzzer on for 2 seconds
+//   digitalWrite(buzzerRelayPin, LOW); // Turn on buzzer to indicate end of cycle
+//   delay(2000);
 }
