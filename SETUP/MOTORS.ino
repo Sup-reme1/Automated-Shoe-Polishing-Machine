@@ -155,7 +155,11 @@ void setStep(int a, int b, int c, int d) {
   mcp.digitalWrite(A_1, b);
   mcp.digitalWrite(A_2, c);
   mcp.digitalWrite(A_3, d);
+<<<<<<< HEAD
   delayMicroseconds(STEP_DELAY);
+=======
+  //
+>>>>>>> 9dc32ef (formatted the syntax)
 }
 
 void changePolishBrush(int cycles){
@@ -175,6 +179,7 @@ void changePolishBrush(int cycles){
   }
   setStep(LOW, LOW, LOW, LOW);
 }
+<<<<<<< HEAD
 
 // Shoe cleaning functions
 void cleanShoe() {
@@ -216,3 +221,5 @@ void polishShoe(){
    driveStepper2AntiClockWise();  // Drive shoe holder
    driveStepper2AntiClockWise();  // Drive shoe holder
 }
+=======
+>>>>>>> 9dc32ef (formatted the syntax)

@@ -4,7 +4,7 @@
 #include <Adafruit_BusIO_Register.h>
 #include <Adafruit_MCP23XXX.h>
 #include <Adafruit_MCP23X17.h>
-#include <Adafruit_MCP23X08.h>
+//#include <Adafruit_MCP23X08.h>
 
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
@@ -66,6 +66,7 @@ void setup() {
 
   // drive pins low
   setStep(LOW, LOW, LOW, LOW);
+  delayMicroseconds(STEP_DELAY);
 
   //Initializing Stepper motor 
   initializeMotor();

@@ -1,0 +1,184 @@
+// Add the library with motor functions
+#include <Wire.h> 
+#include <LiquidCrystal_I2C.h>
+#include <Adafruit_BusIO_Register.h>
+#include <Adafruit_MCP23XXX.h>
+#include <Adafruit_MCP23X17.h>
+
+
+// Set the LCD address to 0x27 for a 16 chars and 2 line display
+LiquidCrystal_I2C lcd(0x27, 16, 2);
+
+
+
+// Define system states
+enum SystemState {
+  CHECKING_LEVELS,
+  REFILL_PROMPT,
+  ENTER_COLOR,
+  INSERT_SHOE,
+  CLOSE_DOOR,
+  POLISHING,
+  EMERGENCY_STOP,
+  // Add other states as needed
+};
+
+
+SystemState currentState = CHECKING_LEVELS;
+
+//  SETUP
+void setup() {
+
+};
+
+//  LOOP
+void loop() {
+  switch (currentState) {
+    case ENTER_COLOR:
+      // Wait for a button press to select color
+      if (digitalRead(BpolishButtonPin) == LOW) {
+        currentState = INSERT_SHOE;
+        Shoe.color = 0;
+        lcd.print("Insert Black Shoe");
+        delay(200); // Debounce
+      }else if(digitalRead(BrpolishButtonPin) == LOW){
+        currentState = INSERT_SHOE;
+        Shoe.color = 1;
+        lcd.print("Insert Brown Shoe");
+        delay(200); // Debounce
+      }
+      break;
+
+    case INSERT_SHOE:      // Check if shoe is present
+      if (digitalRead(shoeSensorPin) == HIGH) { // HIGH or LOW depending on sensor type
+        currentState = CLOSE_DOOR;
+        lcd.print("Close the Door");
+      }
+      break;
+
+    case CLOSE_DOOR:
+      // Check if door is closed
+      if (digitalRead(doorSensorPin) == LOW) { // LOW because of INPUT_PULLUP
+        currentState = POLISHING;
+        lcd.print("Polishing");
+        delay(5000);  // delay before initiating engine
+      }
+      break;
+
+    case EMERGENCY_STOP: // Always check for e-stop in polishing loop
+      if (digitalRead(stopButtonPin) == LOW) {
+        currentState = EMERGENCY_STOP;
+        lcd.print("Emergency Stop, Hit the red btn");
+        delay(200);
+      } else if (digitalRead(stopButtonPin) == HIGH){
+        currentState = POLISHING;
+        lcd.print("Polishing");
+        delay(200);
+      }
+      break;
+
+    case POLISHING:
+      // Your polishing logic goes here
+      // Turn on motors, run pump for a specified duration, etc.
+//      driveAndReturn(stepper1, 2000, 1000, 500);
+      // E.g., digitalWrite(pumpRelayPin, HIGH);
+      // delay(20000); // 20 seconds
+      // digitalWrite(pumpRelayPin, LOW);
+      // After polishing is complete, return to a ready state
+      currentState = CHECKING_LEVELS; // Reset to the start of the flow
+      break;
+  }
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+//  FUNCTIONS
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+// Function to read polish/fluid level 
+bool readPolishLevel(int trigPin, int echoPin) {
+    long duration;
+    int distance;
+    digitalWrite(trigPin, LOW);   // Clears the trigPin
+    delayMicroseconds(2);    
+    digitalWrite(trigPin, HIGH);  // Sets the trigPin on HIGH state for 10 micro seconds
+    delayMicroseconds(10);
+    digitalWrite(trigPin, LOW);
+    duration = pulseIn(echoPin, HIGH);  // Reads the echoPin, returns the sound wave travel time in microseconds
+    distance= duration*0.034/2;    // Calculating the distance
+    Serial.print("Distance: ");
+    Serial.println(distance);
+
+    if (distance < 5){
+      return false;
+    }
+  return true;
+}
+
+
+//
+// Function to Dynamicaly display string if int is 1, the display has 2 rows
+void lcdDisplay (String text, int row){
+//  lcd.clear();
+  
+  if (text.length() <= 16){ // if text lesser than 16
+    lcd.setCursor(0, row);
+    lcd.print(text);
+  } else{ // if text greater than 16
+    String line1 = text.substring(0,16);  // Display first 16 char
+    lcd.setCursor(0, row);
+    lcd.print(line1);
+
+    String line2 = text.substring(16);
+    lcd.setCursor(0, row + 1);
+    lcd.print(line2);
+  }
+//  delay(1000);
+}
+
+//
+// The function takes a nema17 stepper motor object as a reference and other parameter to run a particular Stepper motor
+void driveAndReturnNema17(AccelStepper& stepper, long distance, float max_speed, float acceleration) {
+  // Set the motor's maximum speed and acceleration.
+  stepper.setMaxSpeed(max_speed);
+  stepper.setAcceleration(acceleration);
+
+  // Set the target position.
+  stepper.moveTo(distance);
+
+  // Run the motor until the target position is reached.
+  while (stepper.currentPosition() != distance) {
+    stepper.run();
+  }
+
+  // Return the motor to its starting position (0).
+  stepper.moveTo(0);
+
+  // Run the motor until the starting position is reached.
+  while (stepper.currentPosition() != 0) {
+    stepper.run();
+  }
+} 
+
+//
+// The function takes a 28BYJ-48 stepper motor object as a reference and other parameter to run a particular Stepper motor
+void moveNema17(AccelStepper& stepper, long distance, float max_speed, float acceleration) {
+  // Set the motor's maximum speed and acceleration.
+  stepper.setMaxSpeed(max_speed);
+  stepper.setAcceleration(acceleration);
+
+  // Set the target position.
+  stepper.moveTo(distance);
+
+  // Run the motor until the target position is reached.
+  while (stepper.currentPosition() != distance) {
+    stepper.run();
+  }
+
+  // Return the motor to its starting position (0).
+  stepper.moveTo(0);
+
+  // Run the motor until the starting position is reached.
+  while (stepper.currentPosition() != 0) {
+    stepper.run();
+  }
+}
