@@ -4,8 +4,9 @@
 #include <Adafruit_BusIO_Register.h>
 #include <Adafruit_MCP23XXX.h>
 #include <Adafruit_MCP23X17.h>
-//#include <Adafruit_MCP23X08.h>
 
+
+// Set the LCD address to 0x27 for a 16 chars and 2 line display
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
 //create an instance
@@ -47,10 +48,21 @@ const int buzzerRelayPin = 5; // Analog pin 1 - Pin to control the buzzer relay
 const int pump1RelayPin = 6; // Pin to control the pump1 water relay
 const int pump2RelayPin = 7; // Pin to control the pump2 relay
 
-///////////////
+
+
+// Define system states
+enum SystemState {
+  ENTER_COLOR,
+  START,
+  // Add other states as needed
+};
+
+
+SystemState currentState = ENTER_COLOR;
+
 //  SETUP
 void setup() {
-  //starts mcp in I2C mode
+//starts mcp in I2C mode
   mcp.begin_I2C();
 
   lcd.begin();
@@ -94,32 +106,36 @@ void setup() {
   digitalWrite(dirpin3, LOW); 
   digitalWrite(steppin3, LOW); 
 
-  changePolishBrush(1);
-}
+};
 
-void loop() { 
-  screen("Polish default to Color Black");
-  screen("Press the BLACK btn for Color Brown or Press the RED btn to start polishing");
+//  LOOP
+void loop() {
+  switch (currentState) {
+    case ENTER_COLOR:
+      // Wait for a button press to select color
+      int blackButtonState = digitalRead(BpolishButtonPin);
+      int brownButtonState = digitalRead(BrpolishButtonPin);
+      
+      if (brownButtonState == LOW){
+        currentState = START;
+        screen("Brown Polish Selected");
+        fixScreen("Changing brush face");
+        changePolishBrush(1);
+        screen("Press the RED btn to start polishing");
+      } 
+      break;
 
-  int blackButtonState = digitalRead(BpolishButtonPin);
-  int brownButtonState = digitalRead(BrpolishButtonPin);
-  int start = digitalRead(startButtonPin);
-  delay(500);
-  
-  if (brownButtonState == LOW){
-    screen("Brown Polish Selected");
-    fixScreen("Changing brush face");
-    changePolishBrush(1);
-    screen("Press the RED btn to start polishing");
-  } 
-  else if (start == LOW){ // Btn to engage polish sequence
-    fixScreen("Polishing");
-    delay(500);
-    // Engine Starts Here
-    cleanShoe();
-    polishShoe();
-    alertUser();
-  } 
-  
 
+    case START: // Always check for e-stop in polishing loop
+      int start = digitalRead(startButtonPin);
+      if (start == LOW) {
+        lcd.print("Polishing in progress");
+        delay(200);
+        // Engine Starts Here
+        cleanShoe(); 
+        polishShoe();
+        alertUser();
+        currentState = CHECKING_LEVELS; // Reset to the start of the flow
+      break;
+  }
 }
