@@ -1,0 +1,263 @@
+#include <Adafruit_MCP23X08.h>  // If no space remove this
+#include <Adafruit_MCP23X17.h>
+#include <Adafruit_MCP23XXX.h>
+#include <Wire.h> 
+#include <LiquidCrystal_I2C.h>
+#include <AccelStepper.h>
+
+
+// Set the LCD address to 0x27 for a 16 chars and 2 line display
+LiquidCrystal_I2C lcd(0x27, 16, 2);
+
+// Define the pins for your components
+const int Btrig // Digital pin for the ultrasonic sensor repeat for 3 sensors
+const int Becho // Digital pin for the ultrasonic sensor
+const int doorSensorPin = 2; // Digital pin for the magnetic reed switch
+const int shoeSensorPin = 3; // Digital pin for the IR proximity sensor
+const int BpolishButtonPin = 4; // Pin for the button to select polish
+const int BrpolishButtonPin = 5; // Pin for the button to select polish
+const int stopButtonPin = 6; // Pin for the start button
+const int pumpRelayPin = 7; // Pin to control the pump relay
+// Add pins for your stepper motor drivers, etc.
+
+// Initialize your three stepper motor objects with their respective pins.
+AccelStepper polishBrush(AccelStepper::DRIVER, 2, 3); 
+AccelStepper cleanBrush(AccelStepper::DRIVER, 4, 5); 
+AccelStepper shoeRoller(AccelStepper::DRIVER, 6, 7); 
+//AccelStepper moveNema1(AccelStepper::FULL4WIRE, 8, 10, 9, 11); 
+//AccelStepper moveNema2(AccelStepper::FULL4WIRE, 12, 14, 13, 15);
+//AccelStepper rotateBrush(AccelStepper::FULL4WIRE, 16, 18, 17, 19);
+
+// --- GPIO Expander Object ---
+Adafruit_MCP23X17 mcp;
+
+// Define system states
+enum SystemState {
+  CHECKING_LEVELS,
+  REFILL_PROMPT,
+  ENTER_COLOR,
+  INSERT_SHOE,
+  CLOSE_DOOR,
+  POLISHING,
+  EMERGENCY_STOP,
+  // Add other states as needed
+};
+
+struct {//  Machine components states
+  bool isFluid;
+  bool shoeInserted;
+  bool doorClose; //  Shoe data
+  int color; // 0 for black, 1 for brown
+  String Display;
+} Shoe;
+
+SystemState currentState = CHECKING_LEVELS;
+
+// Function definitions
+void lcdDisplay (String, int row = 0);
+void driveAndReturnNema17(AccelStepper& stepper, long distance, float max_speed, float acceleration);
+void moveNema17(AccelStepper& stepper, long distance, float max_speed, float acceleration);
+bool readPolishLevel(int trigPin, int echoPin);
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+//  SETUP
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+void setup() {
+  Serial.begin(9600);
+  mcp.begin_I2C(0x20);
+
+   // Array of pins for the Nema 17 motors
+  int nema17_pins[] = {2, 3, 4, 5, 6, 7};
+  for (int pin : nema17_pins) { // Initialize Nema 17 motor pins in a loop
+    mcp.pinMode(pin, OUTPUT);
+  }
+
+  // Array of pins for the 28BYJ-48 motors
+  int byj_pins[] = {8, 10, 9, 11, 12, 14, 13, 15, 16, 18, 17, 19};
+  for (int pin : byj_pins) { // Initialize 28BYJ-48 motor pins in a loop
+    mcp.pinMode(pin, OUTPUT);
+  }
+  
+  // Set up all your pins as inputs or outputs
+  pinMode(liquidLevelPin, INPUT);
+  pinMode(doorSensorPin, INPUT_PULLUP); // Use INPUT_PULLUP for the reed switch
+  pinMode(shoeSensorPin, INPUT);
+  pinMode(BpolishButtonPin, INPUT_PULLUP);
+  pinMode(BrpolishButtonPin, INPUT_PULLUP);
+  pinMode(stopButtonPin, INPUT_PULLUP);
+  
+  pinMode(pumpRelayPin, OUTPUT);
+  
+  // Initialize LCD display
+  lcd.begin();
+  lcd.backlight();
+  lcdDisplay("Shoe Polishing");
+  lcdDisplay("Machine", 1);
+  
+  // Set up motor drivers
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+//  LOOP
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+void loop() {
+  switch (currentState) {
+    case CHECKING_LEVELS:
+      // Read sensor values to check polish and water levels
+      if (readPolishLevel(Btrig,Becho) && readPolishLevel(BRtrig,BRecho) && readPolishLevel(Wtrig,Wecho)) {
+        currentState = ENTER_COLOR;
+        lcd.print("Enter Polish Color");
+      } else {
+        lcd.print("Refil Water & Polish");
+      }
+      break;
+
+    case ENTER_COLOR:
+      // Wait for a button press to select color
+      if (digitalRead(BpolishButtonPin) == LOW) {
+        currentState = INSERT_SHOE;
+        Shoe.color = 0;
+        lcd.print("Insert Black Shoe");
+        delay(200); // Debounce
+      }else if(digitalRead(BrpolishButtonPin) == LOW){
+        currentState = INSERT_SHOE;
+        Shoe.color = 1;
+        lcd.print("Insert Brown Shoe");
+        delay(200); // Debounce
+      }
+      break;
+
+    case INSERT_SHOE:      // Check if shoe is present
+      if (digitalRead(shoeSensorPin) == HIGH) { // HIGH or LOW depending on sensor type
+        currentState = CLOSE_DOOR;
+        lcd.print("Close the Door");
+      }
+      break;
+
+    case CLOSE_DOOR:
+      // Check if door is closed
+      if (digitalRead(doorSensorPin) == LOW) { // LOW because of INPUT_PULLUP
+        currentState = POLISHING;
+        lcd.print("Polishing");
+        delay(5000);  // delay before initiating engine
+      }
+      break;
+
+    case EMERGENCY_STOP: // Always check for e-stop in polishing loop
+      if (digitalRead(stopButtonPin) == LOW) {
+        currentState = EMERGENCY_STOP;
+        lcd.print("Emergency Stop, Hit the red btn");
+        delay(200);
+      } else if (digitalRead(stopButtonPin) == HIGH){
+        currentState = POLISHING;
+        lcd.print("Polishing");
+        delay(200);
+      }
+      break;
+
+    case POLISHING:
+      // Your polishing logic goes here
+      // Turn on motors, run pump for a specified duration, etc.
+//      driveAndReturn(stepper1, 2000, 1000, 500);
+      // E.g., digitalWrite(pumpRelayPin, HIGH);
+      // delay(20000); // 20 seconds
+      // digitalWrite(pumpRelayPin, LOW);
+      // After polishing is complete, return to a ready state
+      currentState = CHECKING_LEVELS; // Reset to the start of the flow
+      break;
+  }
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+//  FUNCTIONS
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+// Function to read polish/fluid level 
+bool readPolishLevel(int trigPin, int echoPin) {
+    long duration;
+    int distance;
+    digitalWrite(trigPin, LOW);   // Clears the trigPin
+    delayMicroseconds(2);    
+    digitalWrite(trigPin, HIGH);  // Sets the trigPin on HIGH state for 10 micro seconds
+    delayMicroseconds(10);
+    digitalWrite(trigPin, LOW);
+    duration = pulseIn(echoPin, HIGH);  // Reads the echoPin, returns the sound wave travel time in microseconds
+    distance= duration*0.034/2;    // Calculating the distance
+    Serial.print("Distance: ");
+    Serial.println(distance);
+
+    if (distance < 5){
+      return false;
+    }
+  return true;
+}
+
+
+//
+// Function to Dynamicaly display string if int is 1, the display has 2 rows
+void lcdDisplay (String text, int row){
+//  lcd.clear();
+  
+  if (text.length() <= 16){ // if text lesser than 16
+    lcd.setCursor(0, row);
+    lcd.print(text);
+  } else{ // if text greater than 16
+    String line1 = text.substring(0,16);  // Display first 16 char
+    lcd.setCursor(0, row);
+    lcd.print(line1);
+
+    String line2 = text.substring(16);
+    lcd.setCursor(0, row + 1);
+    lcd.print(line2);
+  }
+//  delay(1000);
+}
+
+//
+// The function takes a nema17 stepper motor object as a reference and other parameter to run a particular Stepper motor
+void driveAndReturnNema17(AccelStepper& stepper, long distance, float max_speed, float acceleration) {
+  // Set the motor's maximum speed and acceleration.
+  stepper.setMaxSpeed(max_speed);
+  stepper.setAcceleration(acceleration);
+
+  // Set the target position.
+  stepper.moveTo(distance);
+
+  // Run the motor until the target position is reached.
+  while (stepper.currentPosition() != distance) {
+    stepper.run();
+  }
+
+  // Return the motor to its starting position (0).
+  stepper.moveTo(0);
+
+  // Run the motor until the starting position is reached.
+  while (stepper.currentPosition() != 0) {
+    stepper.run();
+  }
+} 
+
+//
+// The function takes a 28BYJ-48 stepper motor object as a reference and other parameter to run a particular Stepper motor
+void moveNema17(AccelStepper& stepper, long distance, float max_speed, float acceleration) {
+  // Set the motor's maximum speed and acceleration.
+  stepper.setMaxSpeed(max_speed);
+  stepper.setAcceleration(acceleration);
+
+  // Set the target position.
+  stepper.moveTo(distance);
+
+  // Run the motor until the target position is reached.
+  while (stepper.currentPosition() != distance) {
+    stepper.run();
+  }
+
+  // Return the motor to its starting position (0).
+  stepper.moveTo(0);
+
+  // Run the motor until the starting position is reached.
+  while (stepper.currentPosition() != 0) {
+    stepper.run();
+  }
+}

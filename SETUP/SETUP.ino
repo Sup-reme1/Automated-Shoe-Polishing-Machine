@@ -33,12 +33,12 @@ int steppin2 = 13;
 int dirpin3;
 int steppin3;
 
-int preDefinedDistance = 225;
+int preDefinedDistance = 235;
 
 // Define the pins for your components
-const int stopButtonPin = 3; // Pin for the start button
-const int BpolishButtonPin = 4; // Pin for the button to select polish
-const int BrpolishButtonPin = 5; // Pin for the button to select polish
+const int startButtonPin = 2; // Pin for the start button
+const int BpolishButtonPin = 3; // Pin for the button to select polish
+const int BrpolishButtonPin = 4; // Pin for the button to select polish
 
 const int doorSensorPin ;  // Digital pin for the magnetic reed switch
 const int shoeSensorPin ;  // Digital pin for the IR proximity sensor
@@ -50,8 +50,6 @@ const int pump2RelayPin = 7; // Pin to control the pump2 relay
 ///////////////
 //  SETUP
 void setup() {
-  Serial.begin(9600);
-
   //starts mcp in I2C mode
   mcp.begin_I2C();
 
@@ -78,7 +76,7 @@ void setup() {
   digitalWrite(pump2RelayPin, LOW);  
 
   // Set up  pins as inputs or outputs
-  pinMode(stopButtonPin, INPUT_PULLUP);
+  pinMode(startButtonPin, INPUT_PULLUP);
   pinMode(BpolishButtonPin, INPUT_PULLUP);
   pinMode(BrpolishButtonPin, INPUT_PULLUP);
 
@@ -95,75 +93,32 @@ void setup() {
   digitalWrite(dirpin3, LOW); 
   digitalWrite(steppin3, LOW); 
 
+  changePolishBrush(1);
 }
 
 void loop() { 
-//  screen("Enter Polish Color");
+  screen("Polish default to Color Black");
+  screen("Press the BLACK btn for Color Brown or Press the RED btn to start polishing");
+
+  int blackButtonState = digitalRead(BpolishButtonPin);
+  int brownButtonState = digitalRead(BrpolishButtonPin);
+  int start = digitalRead(startButtonPin);
+  delay(500);
   
-  if (digitalRead(BpolishButtonPin) == LOW){
-    screen("Black Polish");
+  if (brownButtonState == LOW){
+    screen("Brown Polish Selected");
+    fixScreen("Changing brush face");
+    changePolishBrush(1);
+    screen("Press the RED btn to start polishing");
   } 
-  else if (digitalRead(BrpolishButtonPin) == LOW){
-    screen("Brown Polish");
-  }
-  else if (digitalRead(stopButtonPin) == LOW){
-    screen("Polishing");
-    delay(2000);
-    // Engine is inserted here
+  else if (start == LOW){ // Btn to engage polish sequence
+    fixScreen("Polishing");
+    delay(500);
+    // Engine Starts Here
+//    cleanShoe();
+    polishShoe();
+    alertUser();
   } 
-
-//  screen("water pump");
-//  turnOnWaterPump();
-//  delay(500);
-//  screen("Polish pump");
-//  turnOnPump();
-//  delay(500);
-
-  driveStepper2ClockWise();
-  delay(500);
-  driveStepper2ClockWise();
-  delay(500);
-  driveStepper2ClockWise();
-  delay(500);
-  driveStepper2ClockWise();
-  delay(500);
-
-//  driveStepper1();
   
-  // Engine Starts Here
-  // Clean routine
-  // Move stepper 1 forward 
-//   driveStepper2AntiClockWise();
-//   turnOnWaterPump();
-//   driveStepper2AntiClockWise();    
-//   driveStepper1();  // Clean left side of the shoe 
-//   turnOnWaterPump();
-//   driveStepper2AntiClockWise();  // Drive shoe holder 
-//   driveStepper1();  // Clean top side of the shoe
-//   turnOnWaterPump();
-//   driveStepper2AntiClockWise();  // Drive shoe holder
-//   driveStepper1();  // Clean right side of the shoe
 
-   // Adjust this function to return the shoe to the start position
-//   driveStepper2ClockWise();  // Drive shoe holder
-   // polishing routine  
-//   turnOnPump();     // Activate pump for black polish on right side
-//   driveStepper2ClockWise();  // Drive shoe holder
-//   driveStepper3();  // Polish right side of shoe
-//  
-//   turnOnPump();     // Activate pump for black polish on top side  
-//   driveStepper2ClockWise();  // Drive shoe holder
-//   driveStepper3();  // Polish top side of shoe
-//
-//   turnOnPump();     // Activate pump for black polish
-//   driveStepper2ClockWise();  // Drive shoe holder
-//   driveStepper3();  // Drive polish brush and return to start
-//  
-//   driveStepper2AntiClockWise();  // Drive shoe holder
-//   driveStepper2AntiClockWise();  // Drive shoe holder
-
-//   digitalWrite(buzzerRelayPin, HIGH); // Turn on buzzer to indicate end of cycle
-//   delay(2000); // Buzzer on for 2 seconds
-//   digitalWrite(buzzerRelayPin, LOW); // Turn on buzzer to indicate end of cycle
-//   delay(2000);
 }
