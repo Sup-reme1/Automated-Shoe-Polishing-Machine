@@ -19,7 +19,6 @@ void initializeMotor(){
 }
 
 void screen(String staticMessage, String scrollMessage) {
-  staticMessage = "Shoe Polishing Machine";
   int displayWidth = 16; 
   int scrollNum = scrollMessage.length() - displayWidth + 1;
 
