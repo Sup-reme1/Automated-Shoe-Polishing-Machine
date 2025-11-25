@@ -18,42 +18,34 @@ void initializeMotor(){
   digitalWrite(steppin3, LOW);
 }
 
-void screen(String scrollMessage) {
-//  String scrollMessage = "Shoe Polishing Machine";
+void screen(String staticMessage, String scrollMessage) {
+  staticMessage = "Shoe Polishing Machine";
   int displayWidth = 16; 
+  int scrollNum = scrollMessage.length() - displayWidth + 1;
 
-  // Print the scrolling message to the second row
+  // print static message on top row of screen
   lcd.clear();
   lcd.setCursor(0, 0);
+  lcd.print(staticMessage);
+
+  // Print the scrolling message to the second row
+  lcd.setCursor(0, 1);
   lcd.print(scrollMessage);
 
   // Scroll the message to the left
-  for (int i = 0; i < scrollMessage.length() - displayWidth + 1; i++) {
+  for (int i = 0; i < scrollNum; i++) {
     lcd.scrollDisplayLeft();
-    delay(250); // Adjust delay for scrolling speed
-  }
-
- // scroll the message back to the right
-  for (int i = 0; i < scrollMessage.length() - displayWidth + 1; i++) {
-    lcd.scrollDisplayRight();
-    delay(250); // Adjust delay for scrolling speed
-  }
-
-  // Clear the second row to prepare for the next scroll
-  lcd.setCursor(0, 0);
-  for (int i = 0; i < displayWidth; i++) {
-    lcd.print(" ");
-  }
-  delay(1000); // Pause before repeating the scroll
+    delay(200); // Adjust delay for scrolling speed
+  };
 };
 
 // This function take a string as an argument 
 // lesser than 16 char and display it on the lcd screen
-void fixScreen(String Message) {
-  lcd.clear();
-  lcd.setCursor(0, 0);
-  lcd.print(Message);
-}
+// void fixScreen(String Message) {
+//   lcd.clear();
+//   lcd.setCursor(0, 0);
+//   lcd.print(Message);
+// }
 
 // This function turns on the water spray
 void turnOnWaterPump() {
