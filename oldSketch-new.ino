@@ -57,8 +57,16 @@ enum SystemState {
   // Add other states as needed
 };
 
+// Define shoe types
+enum ShoeType {
+  RIGHT_SHOE,
+  LEFT_SHOE,
+  // Add other states as needed
+};
 
-SystemState currentState = ENTER_COLOR;
+
+SystemState currentState = DEFAULT;
+ShoeType shoeType = RIGHT_SHOE;
 
 //  SETUP
 void setup() {
@@ -125,17 +133,51 @@ void loop() {
       } 
       break;
 
+    case START:
+      int start;        
+        switch(shoeType){
+          case RIGHT_SHOE:
+            start = digitalRead(startButtonPin);
+            if (start == LOW) {
+              shoeType = LEFT_SHOE; 
+              lcd.print("Polishing in progress");
+              delay(200);
 
-    case START: // Always check for e-stop in polishing loop
-      int start = digitalRead(startButtonPin);
-      if (start == LOW) {
-        lcd.print("Polishing in progress");
-        delay(200);
-        // Engine Starts Here
-        cleanShoe(); 
-        polishShoe();
-        alertUser();
-        currentState = CHECKING_LEVELS; // Reset to the start of the flow
+              cleanShoe(); 
+              polishShoe();
+              alertUser();
+              // Inform user to enter second foot and hit the START btn
+              fixScreen("Insert Second Shoe and Press the RED button");
+            }
+          break; 
+          case LEFT_SHOE:
+            start = digitalRead(startButtonPin);
+            if (start == HIGH) {
+              shoeType = RIGHT_SHOE; 
+              lcd.print("Polishing in progress");
+              delay(200);
+
+              cleanShoe(); 
+              polishShoe();
+              alertUser();
+            }
+            // Inform user to enter second foot and hit the START btn
+            fixScreen("Remove Shoe");
+            delay(5000);
+
+            currentState = DEFAULT; // Reset to the start of the flow
+          break; 
+        }
       break;
+    
+    case DEFAULT:
+      // WELCOME USER AND PRINT ON SCREEN SECOND ROW TO ENTER COLOR 
+      screen("Shoe Polishing Machine");
+      // PRINT ON LCD SECOND ROW
+
+      currentState = ENTER_COLOR;
+      break;
+  
   }
 }
+
