@@ -24,6 +24,7 @@ void screen(String scrollMessage, int ticker = 0) {
   int scrollNum = scrollMessage.length() - displayWidth + 1;
 
   // Print the scrolling message to the second row
+  lcd.clear();
   lcd.setCursor(0, ticker);
   lcd.print(scrollMessage);
 
@@ -33,11 +34,11 @@ void screen(String scrollMessage, int ticker = 0) {
       lcd.scrollDisplayLeft();
       delay(200); // Adjust delay for scrolling speed
     };
-  }else{
-    lcd.setCursor(0, ticker);
-    lcd.print(scrollMessage);
   }
-    
+  lcd.clear();
+  lcd.setCursor(0, ticker);
+  lcd.print(scrollMessage); 
+  delay(1000); 
 };
 
 // This function take a string as an argument 
@@ -187,25 +188,22 @@ void cleanShoe() {
 }
 // Shoe polishing function
 void polishShoe(){
-   // Adjust this function to return the shoe to the start position
+     // Adjust this function to return the shoe to the start position
    driveStepper2ClockWise();  // Drive shoe holder
    // driveStepper2ClockWise();  // Drive shoe holder
    
    // polishing routine  
    turnOnPump();     // Activate pump for black polish on right side
    driveStepper2ClockWise();  // Drive shoe holder
-  // driveStepper3();  // Polish right side of shoe
-  driveStepper1();
-
+   driveStepper3();  // Polish right side of shoe
+  
    turnOnPump();     // Activate pump for black polish on top side  
    driveStepper2ClockWise();  // Drive shoe holder
-  // driveStepper3();  // Polish top side of shoe
-  driveStepper1();
+   driveStepper3();  // Polish top side of shoe
 
   turnOnPump();     // Activate pump for black polish
   driveStepper2ClockWise();  // Drive shoe holder
-//  driveStepper3();  // Drive polish brush and return to start
-   driveStepper1();
+  driveStepper3();  // Drive polish brush and return to start
 
    driveStepper2AntiClockWise();  // Drive shoe holder
    driveStepper2AntiClockWise();  // Drive shoe holder

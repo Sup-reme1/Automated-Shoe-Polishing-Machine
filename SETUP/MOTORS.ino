@@ -18,25 +18,27 @@ void initializeMotor(){
   digitalWrite(steppin3, LOW);
 }
 
-void screen(String staticMessage, String scrollMessage) {
-  staticMessage = "Shoe Polishing Machine";
+// ticker params is used to indicate the row for the message. It is default to 0
+void screen(String scrollMessage, int ticker = 0) {
   int displayWidth = 16; 
   int scrollNum = scrollMessage.length() - displayWidth + 1;
 
-  // print static message on top row of screen
-  lcd.clear();
-  lcd.setCursor(0, 0);
-  lcd.print(staticMessage);
-
   // Print the scrolling message to the second row
-  lcd.setCursor(0, 1);
+  lcd.clear();
+  lcd.setCursor(0, ticker);
   lcd.print(scrollMessage);
 
   // Scroll the message to the left
-  for (int i = 0; i < scrollNum; i++) {
-    lcd.scrollDisplayLeft();
-    delay(200); // Adjust delay for scrolling speed
-  };
+  if (scrollNum > 0) {
+    for (int i = 0; i < scrollNum; i++) {
+      lcd.scrollDisplayLeft();
+      delay(200); // Adjust delay for scrolling speed
+    };
+  }
+  lcd.clear();
+  lcd.setCursor(0, ticker);
+  lcd.print(scrollMessage); 
+  delay(1000); 
 };
 
 // This function take a string as an argument 
@@ -147,11 +149,7 @@ void setStep(int a, int b, int c, int d) {
   mcp.digitalWrite(A_1, b);
   mcp.digitalWrite(A_2, c);
   mcp.digitalWrite(A_3, d);
-<<<<<<< HEAD
   delayMicroseconds(STEP_DELAY);
-=======
-  //
->>>>>>> 9dc32ef (formatted the syntax)
 }
 
 void changePolishBrush(int cycles){
@@ -171,7 +169,6 @@ void changePolishBrush(int cycles){
   }
   setStep(LOW, LOW, LOW, LOW);
 }
-<<<<<<< HEAD
 
 // Shoe cleaning functions
 void cleanShoe() {
@@ -197,21 +194,16 @@ void polishShoe(){
    // polishing routine  
    turnOnPump();     // Activate pump for black polish on right side
    driveStepper2ClockWise();  // Drive shoe holder
-  // driveStepper3();  // Polish right side of shoe
-  driveStepper1();
-
+   driveStepper3();  // Polish right side of shoe
+  
    turnOnPump();     // Activate pump for black polish on top side  
    driveStepper2ClockWise();  // Drive shoe holder
-  // driveStepper3();  // Polish top side of shoe
-  driveStepper1();
+   driveStepper3();  // Polish top side of shoe
 
   turnOnPump();     // Activate pump for black polish
   driveStepper2ClockWise();  // Drive shoe holder
-//  driveStepper3();  // Drive polish brush and return to start
-   driveStepper1();
+  driveStepper3();  // Drive polish brush and return to start
 
    driveStepper2AntiClockWise();  // Drive shoe holder
    driveStepper2AntiClockWise();  // Drive shoe holder
 }
-=======
->>>>>>> 9dc32ef (formatted the syntax)

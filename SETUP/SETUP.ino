@@ -24,14 +24,11 @@ const int STEP_DELAY = 2000;
 int dirpin1 = 8;
 int steppin1 = 9;
 
-//int dirpin2 = 10;
-//int steppin2 = 11;
+int dirpin2 = 10;
+int steppin2 = 11;
 
-int dirpin2 = 12;
-int steppin2 = 13;
-
-int dirpin3;
-int steppin3;
+int dirpin3 = 12;
+int steppin3 = 13;
 
 int preDefinedDistance = 235;
 
@@ -47,6 +44,7 @@ const int buzzerRelayPin = 5; // Analog pin 1 - Pin to control the buzzer relay
 const int pump1RelayPin = 6; // Pin to control the pump1 water relay
 const int pump2RelayPin = 7; // Pin to control the pump2 relay
 
+void screen(String scrollMessage, int ticker = 0);
 ///////////////
 //  SETUP
 void setup() {
@@ -98,6 +96,7 @@ void setup() {
 }
 
 void loop() { 
+  driveStepper2AntiClockWise();
   screen("Polish default to Color Black");
   screen("Press the BLACK btn for Color Brown or Press the RED btn to start polishing");
 

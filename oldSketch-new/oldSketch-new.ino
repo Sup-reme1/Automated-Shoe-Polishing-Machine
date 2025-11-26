@@ -25,14 +25,11 @@ const int STEP_DELAY = 2000;
 int dirpin1 = 8;
 int steppin1 = 9;
 
-//int dirpin2 = 10;
-//int steppin2 = 11;
+int dirpin2 = 10;
+int steppin2 = 11;
 
-int dirpin2 = 12;
-int steppin2 = 13;
-
-int dirpin3;
-int steppin3;
+int dirpin3 = 12;
+int steppin3 = 13;
 
 int preDefinedDistance = 235;
 
@@ -52,6 +49,7 @@ const int pump2RelayPin = 7; // Pin to control the pump2 relay
 
 // Define system states
 enum SystemState {
+  DEFAULT_MODE,
   ENTER_COLOR,
   START,
   // Add other states as needed
@@ -65,11 +63,11 @@ enum ShoeType {
 };
 
 bool shoeColor = 0; // 0 represent Black and 1 represent Brown
-
-SystemState currentState = DEFAULT;
+  
+SystemState currentState = DEFAULT_MODE;
 ShoeType shoeType = RIGHT_SHOE;
 
-void screen(String scrollMessage = "Shoe Polishing Machine", int ticker = 0);
+void screen(String scrollMessage, int ticker = 0);
 
 //  SETUP
 void setup() {
@@ -79,7 +77,7 @@ void setup() {
   lcd.begin();
   lcd.backlight();  
   lcd.clear();
-  screen();
+  screen("Shoe Polishing Machine");
 
   // configure pin of mcp for output
   mcp.pinMode(A_0, OUTPUT);
@@ -117,11 +115,20 @@ void setup() {
   digitalWrite(dirpin3, LOW); 
   digitalWrite(steppin3, LOW); 
 
+  Serial.begin(9600);
 };
 
 //  LOOP
 void loop() {
+//  driveStepper2ClockWise();
+//  driveStepper3();
+  
+  Serial.println(shoeType);
   switch (currentState) {
+    case DEFAULT_MODE:
+      screen("Enter Polish Color");
+      currentState = ENTER_COLOR;
+    break;
     case ENTER_COLOR:
       // Wait for a button press to select color
       int blackButtonState = digitalRead(BpolishButtonPin);
@@ -138,11 +145,13 @@ void loop() {
       break;
 
     case START:
-      int start;        
+              
         switch(shoeType){
           case RIGHT_SHOE:
-            start = digitalRead(startButtonPin);
+            int start = digitalRead(startButtonPin);
+            Serial.println(start);
             if (start == LOW) {
+              Serial.println("Right shoe block");
               shoeType = LEFT_SHOE; 
               screen("Polishing in progress");
               delay(200);
@@ -156,6 +165,7 @@ void loop() {
           break; 
           case LEFT_SHOE:
             start = digitalRead(startButtonPin);
+            Serial.println(start);
             if (start == HIGH) {
               shoeType = RIGHT_SHOE; 
               screen("Polishing in progress");
@@ -169,19 +179,14 @@ void loop() {
             fixScreen("Remove Shoe");
             delay(5000);
 
-            currentState = DEFAULT; // Reset to the start of the flow
+            currentState = DEFAULT_MODE; // Reset to the start of the flow
             if (shoeColor == 1){    // Reset brush to black if shoe color is brown
               changePolishBrush(1);
             }
           break; 
         }
       break;
-    
-    case DEFAULT:
-      screen("Enter Polish Color");
-      
-      currentState = ENTER_COLOR;
-      break;
-  
+ 
   }
+//  screen("down the loop");
 }
