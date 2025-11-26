@@ -66,10 +66,9 @@ void turnOnPump() {
 
 // This function power the buzzer after polishing
 void alertUser(){
-   digitalWrite(buzzerRelayPin, HIGH); // Turn on buzzer to indicate end of cycle
-   delay(2000); // Buzzer on for 2 seconds
    digitalWrite(buzzerRelayPin, LOW); // Turn on buzzer to indicate end of cycle
-   delay(2000);
+   delay(2000); // Buzzer on for 2 seconds
+   digitalWrite(buzzerRelayPin, HIGH); // Turn on buzzer to indicate end of cycle
 }
 
 // Function to run steppers
