@@ -129,17 +129,18 @@ void runStepper3(int direction, int numOfSteps, int pulsewidthMicros = 35) {
   }
 }
 void driveStepper3(){
-  // Move forward
-  for (int i = 0; i < preDefinedDistance; i++) {
-    runStepper3(HIGH, 3200);
-  }
-  delay(1000); // 1 second pause
-
   // Move backward
   for (int i = 0; i < preDefinedDistance; i++) {
     runStepper3(LOW, 3200);
   }
   delay(1000); // 1 second pause 
+
+
+    // Move forward
+  for (int i = 0; i < preDefinedDistance; i++) {
+    runStepper3(HIGH, 3200);
+  }
+  delay(1000); // 1 second pause
 }
 
 

@@ -96,7 +96,6 @@ void setup() {
 }
 
 void loop() { 
-  driveStepper2AntiClockWise();
   screen("Polish default to Color Black");
   screen("Press the BLACK btn for Color Brown or Press the RED btn to start polishing");
 
