@@ -66,10 +66,9 @@ void turnOnPump() {
 
 // This function power the buzzer after polishing
 void alertUser(){
-   digitalWrite(buzzerRelayPin, HIGH); // Turn on buzzer to indicate end of cycle
-   delay(2000); // Buzzer on for 2 seconds
    digitalWrite(buzzerRelayPin, LOW); // Turn on buzzer to indicate end of cycle
-   delay(2000);
+   delay(2000); // Buzzer on for 2 seconds
+   digitalWrite(buzzerRelayPin, HIGH); // Turn on buzzer to indicate end of cycle
 }
 
 // Function to run steppers
@@ -129,17 +128,18 @@ void runStepper3(int direction, int numOfSteps, int pulsewidthMicros = 35) {
   }
 }
 void driveStepper3(){
-  // Move forward
-  for (int i = 0; i < preDefinedDistance; i++) {
-    runStepper3(HIGH, 3200);
-  }
-  delay(1000); // 1 second pause
-
   // Move backward
   for (int i = 0; i < preDefinedDistance; i++) {
     runStepper3(LOW, 3200);
   }
   delay(1000); // 1 second pause 
+
+
+    // Move forward
+  for (int i = 0; i < preDefinedDistance; i++) {
+    runStepper3(HIGH, 3200);
+  }
+  delay(1000); // 1 second pause
 }
 
 

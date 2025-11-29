@@ -114,7 +114,8 @@ void loop() {
     fixScreen("Polishing");
     delay(500);
     // Engine Starts Here
-//    cleanShoe();
+
+  //  cleanShoe();
     polishShoe();
     alertUser();
   } 
