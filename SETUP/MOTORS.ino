@@ -175,20 +175,20 @@ void cleanShoe() {
   // Clean routine
   // Move stepper 1 forward 
    driveStepper2ClockWise();  // Drive shoe holder 
-   turnOnWaterPump();
+//   turnOnWaterPump();
    driveStepper2AntiClockWise();  // Drive shoe holder 
    driveStepper1();  // Clean left side of the shoe 
-   turnOnWaterPump();
+//   turnOnWaterPump();
    driveStepper2AntiClockWise();  // Drive shoe holder 
    driveStepper1();  // Clean top side of the shoe
-   turnOnWaterPump();
+//   turnOnWaterPump();
    driveStepper2AntiClockWise();  // Drive shoe holder
    driveStepper1();  // Clean right side of the shoe
 }
 // Shoe polishing function
 void polishShoe(){
    // Adjust this function to return the shoe to the start position
-   driveStepper2ClockWise();  // Drive shoe holder
+   driveStepper2AntiClockWise();  // Drive shoe holder
    // driveStepper2ClockWise();  // Drive shoe holder
    
    // polishing routine  

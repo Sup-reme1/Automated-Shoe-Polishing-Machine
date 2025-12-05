@@ -97,7 +97,7 @@ void setup() {
 
 void loop() { 
   screen("Polish default to Color Black");
-  screen("Press the BLACK btn for Color Brown or Press the RED btn to start polishing");
+//  screen("Press the BLACK btn for Color Brown or Press the RED btn to start polishing");
 
   int blackButtonState = digitalRead(BpolishButtonPin);
   int brownButtonState = digitalRead(BrpolishButtonPin);
@@ -115,7 +115,7 @@ void loop() {
     delay(500);
     // Engine Starts Here
 
-  //  cleanShoe();
+    cleanShoe();
     polishShoe();
     alertUser();
   } 
