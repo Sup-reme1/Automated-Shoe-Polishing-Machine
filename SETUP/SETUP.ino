@@ -91,14 +91,12 @@ void setup() {
   digitalWrite(steppin2, LOW); 
   digitalWrite(dirpin3, LOW); 
   digitalWrite(steppin3, LOW); 
-
-  changePolishBrush(1);
+  
 }
 
 void loop() { 
-  screen("Polish default to Color Black");
-//  screen("Press the BLACK btn for Color Brown or Press the RED btn to start polishing");
-
+  screen("Hold the BLACK btn for Brown");
+  screen("Press the RED btn to start polishing");
   int blackButtonState = digitalRead(BpolishButtonPin);
   int brownButtonState = digitalRead(BrpolishButtonPin);
   int start = digitalRead(startButtonPin);
@@ -107,18 +105,21 @@ void loop() {
   if (brownButtonState == LOW){
     screen("Brown Polish Selected");
     fixScreen("Changing brush face");
-    changePolishBrush(1);
-    screen("Press the RED btn to start polishing");
-  } 
-  else if (start == LOW){ // Btn to engage polish sequence
+    changePolishBrush(2);
     fixScreen("Polishing");
     delay(500);
     // Engine Starts Here
-
     cleanShoe();
     polishShoe();
     alertUser();
   } 
-  
-
+  else if (start == LOW){ // Btn to engage polish sequence
+    fixScreen("Initiating Cleaning Phase");
+    // Engine Starts Here
+//    cleanShoe();
+    fixScreen("Initiating Polish Phase");
+    polishShoe();
+    fixScreen("Done Polishing");
+    alertUser();
+  }
 }

@@ -52,14 +52,14 @@ void fixScreen(String Message) {
 // This function turns on the water spray
 void turnOnWaterPump() {
   digitalWrite(pump1RelayPin, LOW);
-  delay(1000);
+  delay(2000);
   digitalWrite(pump1RelayPin, HIGH);
   delay(2000);
 }
 // This function turns on the Polish spray
 void turnOnPump() {
   digitalWrite(pump2RelayPin, HIGH);
-  delay(1000);
+  delay(2000);
   digitalWrite(pump2RelayPin, LOW);
   delay(2000);
 }
@@ -98,7 +98,7 @@ void driveStepper1(){
 
 //
 // Setting the numOfSteps to 48 to increase the speed
-void runStepper2(int direction, int pulsewidthMicros = 10000000, int numOfSteps=800) {
+void runStepper2(int direction, int numOfSteps=800, int pulsewidthMicros = 10000000) {
   digitalWrite(dirpin2, direction);
   for (int n = 0; n < numOfSteps; n++) {
     digitalWrite(steppin2, HIGH);
@@ -107,14 +107,14 @@ void runStepper2(int direction, int pulsewidthMicros = 10000000, int numOfSteps=
     delayMicroseconds(pulsewidthMicros);  
   }
 }
-void driveStepper2ClockWise(){
+void driveStepper2ClockWise(int x=800){
   // Move forward
-  runStepper2(HIGH);
+  runStepper2(HIGH, x);
   delay(1000); // 1 second pause
 }
-void driveStepper2AntiClockWise(){
+void driveStepper2AntiClockWise(int x=800){
   // Move Backward
-  runStepper2(LOW);
+  runStepper2(LOW, x);
   delay(1000); // 1 second pause
 }
 
@@ -128,18 +128,17 @@ void runStepper3(int direction, int numOfSteps, int pulsewidthMicros = 35) {
   }
 }
 void driveStepper3(){
-  // Move backward
+    // Move forward
   for (int i = 0; i < preDefinedDistance; i++) {
     runStepper3(LOW, 3200);
   }
-  delay(1000); // 1 second pause 
+  delay(1000); // 1 second pause
 
-
-    // Move forward
+    // Move backward
   for (int i = 0; i < preDefinedDistance; i++) {
     runStepper3(HIGH, 3200);
   }
-  delay(1000); // 1 second pause
+  delay(1000); // 1 second pause 
 }
 
 
@@ -174,36 +173,74 @@ void changePolishBrush(int cycles){
 void cleanShoe() {
   // Clean routine
   // Move stepper 1 forward 
-   driveStepper2ClockWise();  // Drive shoe holder 
+
+   // Drive shoe holder 
+//   driveStepper2ClockWise();  
+   
 //   turnOnWaterPump();
-   driveStepper2AntiClockWise();  // Drive shoe holder 
-   driveStepper1();  // Clean left side of the shoe 
+   driveStepper1(); 
+
+    // Drive shoe holder 
+   driveStepper2AntiClockWise(); 
+
+    // Clean left side of the shoe 
+   driveStepper1(); 
+   
+   turnOnWaterPump();
+
+   // Drive shoe holder 
+   driveStepper2AntiClockWise();  
+
+    // Clean top side of the shoe
+   driveStepper1(); 
+   
 //   turnOnWaterPump();
-   driveStepper2AntiClockWise();  // Drive shoe holder 
-   driveStepper1();  // Clean top side of the shoe
-//   turnOnWaterPump();
-   driveStepper2AntiClockWise();  // Drive shoe holder
-   driveStepper1();  // Clean right side of the shoe
+   
+   // Drive shoe holder
+   driveStepper2AntiClockWise(805);  
+
+   // Clean right side of the shoe
+   driveStepper1();  
 }
 // Shoe polishing function
 void polishShoe(){
-   // Adjust this function to return the shoe to the start position
-   driveStepper2AntiClockWise();  // Drive shoe holder
-   // driveStepper2ClockWise();  // Drive shoe holder
-   
-   // polishing routine  
-   turnOnPump();     // Activate pump for black polish on right side
-   driveStepper2ClockWise();  // Drive shoe holder
-   driveStepper3();  // Polish right side of shoe
+  // Adjust this function to return the shoe to the start position
+  driveStepper2ClockWise(1200);  // Drive shoe holder
   
-   turnOnPump();     // Activate pump for black polish on top side  
-   driveStepper2ClockWise();  // Drive shoe holder
-   driveStepper3();  // Polish top side of shoe
+  // polishing routine 
+  
+  // Activate pump for black polish on right side
+  turnOnPump();     
 
-  turnOnPump();     // Activate pump for black polish
-  driveStepper2ClockWise();  // Drive shoe holder
-  driveStepper3();  // Drive polish brush and return to start
+  // Drive shoe holder
+  driveStepper2ClockWise(650); 
 
-   driveStepper2AntiClockWise();  // Drive shoe holder
-   driveStepper2AntiClockWise();  // Drive shoe holder
+  // Polish right side of shoe
+  driveStepper3();  
+
+  // Activate pump for black polish on top side 
+  turnOnPump();
+
+  
+  driveStepper2ClockWise(400);  // Drive shoe holder
+
+  driveStepper3();  // Polish top side of shoe
+
+  // Drive shoe holder
+  driveStepper2AntiClockWise(300);  
+
+  // Activate pump for black polish
+  turnOnPump();     
+
+  // Drive shoe holder
+  driveStepper2ClockWise(850);  
+
+  // Drive polish brush and return to start
+  driveStepper3();  
+
+  // Drive shoe holder
+  driveStepper2AntiClockWise();  
+
+  // Drive shoe holder
+  driveStepper2AntiClockWise();  
 }
