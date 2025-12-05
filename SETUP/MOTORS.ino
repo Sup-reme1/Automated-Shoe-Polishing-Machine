@@ -52,16 +52,16 @@ void fixScreen(String Message) {
 // This function turns on the water spray
 void turnOnWaterPump() {
   digitalWrite(pump1RelayPin, LOW);
-  delay(2000);
+  delay(1000);
   digitalWrite(pump1RelayPin, HIGH);
-  delay(2000);
+  delay(1000);
 }
 // This function turns on the Polish spray
 void turnOnPump() {
   digitalWrite(pump2RelayPin, HIGH);
   delay(2000);
   digitalWrite(pump2RelayPin, LOW);
-  delay(2000);
+  delay(1000);
 }
 
 // This function power the buzzer after polishing

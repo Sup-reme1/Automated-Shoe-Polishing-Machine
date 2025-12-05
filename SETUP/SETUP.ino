@@ -114,10 +114,12 @@ void loop() {
     alertUser();
   } 
   else if (start == LOW){ // Btn to engage polish sequence
-    fixScreen("Initiating Cleaning Phase");
     // Engine Starts Here
+    fixScreen("Initiating Cleaning Phase");
+    fixScreen("Cleaning Shoe");
 //    cleanShoe();
     fixScreen("Initiating Polish Phase");
+    fixScreen("Polishing Shoe");
     polishShoe();
     fixScreen("Done Polishing");
     alertUser();
